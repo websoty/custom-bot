@@ -6,7 +6,8 @@ export function renderNode(ctx: Context, node: BotNode) {
 
   const keyboard = {
     inline_keyboard:
-      node.buttons?.map(b => [{ text: b.label, callback_data: b.goTo }]) ?? []
+      node.buttons?.map((b) => [{ text: b.label, callback_data: b.goTo }]) ??
+      [],
   };
 
   // якщо це клік по кнопці  редаг існуюче повідомлення
@@ -14,7 +15,8 @@ export function renderNode(ctx: Context, node: BotNode) {
     // є текст  міняємо текст + кнопки
     if (node.text) {
       return ctx.editMessageText(node.text, {
-        reply_markup: keyboard
+        parse_mode: "HTML",
+        reply_markup: keyboard,
       });
     }
 
@@ -22,8 +24,8 @@ export function renderNode(ctx: Context, node: BotNode) {
     return ctx.editMessageReplyMarkup(keyboard);
   }
 
-  // перший рендер 
+  // перший рендер
   return ctx.reply(node.text ?? " ", {
-    reply_markup: keyboard
+    reply_markup: keyboard,
   });
 }

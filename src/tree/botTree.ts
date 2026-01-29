@@ -1,6 +1,18 @@
 import type { BotNode } from "../types/bot.js";
+import { vacancies } from "../services/vacancies.js";
 
 export const botTree: Record<string, BotNode> = {
+
+all_vacancies: {
+  id: "all_vacancies",
+  text: "Доступні вакансії:",
+  buttons: vacancies.map(v => ({
+    label: v.title,
+    goTo: `vacancy_${v.id}`
+  })).concat([{ label: "⬅️ Повернутись у головне меню", goTo: "start" }])
+},
+
+
   start: {
     id: "start",
     text: "Ви у головному меню, оберіть потрібний вам розділ ⬇️",
@@ -101,16 +113,6 @@ export const botTree: Record<string, BotNode> = {
       { label: "⬅️ Назад", goTo: "rank" },
     ],
   },
-
-  // civilian
-  // join_civilian: {
-  //   id: "join_civilian",
-  //   text: "Цивільний",
-  //   buttons: [
-  //     { label: "Так", goTo: "civilian_education" },
-  //     { label: "⬅️ Назад", goTo: "join" },
-  //   ],
-  // },
 
   civilian_education: {
     id: "civilian_education",
