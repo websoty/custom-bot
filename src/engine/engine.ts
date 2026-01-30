@@ -5,6 +5,9 @@ import { getVacancyById } from "../services/vacancies.js";
 import type { BotNode } from "../types/bot.js";
 import { makeVacanciesKeyboard } from "../utils/pagination.js";
 import { userPage } from "../store/userState.js";
+import { vacancies } from "../services/vacancies.js";
+import { unitVacancies } from "../services/unitVacancies.js";
+import { renderVacancyList } from "../utils/renderVacancyList.js";
 
 const userState = new Map<number, string>();
 
@@ -16,47 +19,119 @@ export function handleStart(ctx: Context) {
   renderNode(ctx, botTree["start"]!);
 }
 
-export function handleAction(ctx: Context) {
-  if (!ctx.callbackQuery) return;
-  if (!("data" in ctx.callbackQuery)) return;
+export async function handleAction(ctx: Context) {
+  if (!ctx.callbackQuery || !("data" in ctx.callbackQuery)) return;
 
-  ctx.answerCbQuery();
+  try {
+    await ctx.answerCbQuery();
+  } catch {}
 
   const userId = ctx.from!.id;
-  const nextNodeId = ctx.callbackQuery.data;
-  if (nextNodeId === "no_action") return;
-  if (nextNodeId === "all_vacancies") {
-    userPage.set(userId, 0); // first page
-    const keyboard = makeVacanciesKeyboard(0);
-    return ctx.editMessageText("Доступні вакансії:", {
-      reply_markup: {
-        inline_keyboard: keyboard,
-      },
-    });
+  const pageState = userPage.get(userId) ?? { all: 0, units: 0 };
+  userPage.set(userId, pageState);
+
+  const action = ctx.callbackQuery.data;
+  if (action === "no_action") return;
+
+  // ===== ALL VACANCIES =====
+
+  if (action === "all_vacancies") {
+    return renderVacancyList(ctx, pageState, {
+      title: "Доступні вакансії:",
+      items: vacancies,
+      pageKey: "all",
+      prevCallback: "vacancies_prev",
+      nextCallback: "vacancies_next",
+    }, "init");
   }
 
-  if (nextNodeId === "vacancies_prev" || nextNodeId === "vacancies_next") {
-    let page = userPage.get(userId) ?? 0;
-    if (nextNodeId === "vacancies_prev" && page > 0) page--;
-    if (nextNodeId === "vacancies_next") page++;
-    userPage.set(userId, page);
-
-    const keyboard = makeVacanciesKeyboard(page);
-    return ctx.editMessageReplyMarkup({ inline_keyboard: keyboard });
+  if (action === "vacancies_prev") {
+    return renderVacancyList(ctx, pageState, {
+      title: "Доступні вакансії:",
+      items: vacancies,
+      pageKey: "all",
+      prevCallback: "vacancies_prev",
+      nextCallback: "vacancies_next",
+    }, "prev");
   }
 
-  userState.set(userId, nextNodeId);
+  if (action === "vacancies_next") {
+    return renderVacancyList(ctx, pageState, {
+      title: "Доступні вакансії:",
+      items: vacancies,
+      pageKey: "all",
+      prevCallback: "vacancies_prev",
+      nextCallback: "vacancies_next",
+    }, "next");
+  }
 
-  const nextNode = resolveNode(nextNodeId);
+  // ===== UNIT VACANCIES =====
+
+  if (action === "vacancies_units") {
+    return renderVacancyList(ctx, pageState, {
+      title: "Вакансії підрозділів:",
+      items: unitVacancies,
+      pageKey: "units",
+      itemPrefix: "unit_vacancy_",
+      prevCallback: "unit_vacancies_prev",
+      nextCallback: "unit_vacancies_next",
+    }, "init");
+  }
+
+  if (action === "unit_vacancies_prev") {
+    return renderVacancyList(ctx, pageState, {
+      title: "Вакансії підрозділів:",
+      items: unitVacancies,
+      pageKey: "units",
+      itemPrefix: "unit_vacancy_",
+      prevCallback: "unit_vacancies_prev",
+      nextCallback: "unit_vacancies_next",
+    }, "prev");
+  }
+
+  if (action === "unit_vacancies_next") {
+    return renderVacancyList(ctx, pageState, {
+      title: "Вакансії підрозділів:",
+      items: unitVacancies,
+      pageKey: "units",
+      itemPrefix: "unit_vacancy_",
+      prevCallback: "unit_vacancies_prev",
+      nextCallback: "unit_vacancies_next",
+    }, "next");
+  }
+
+  // ===== FALLBACK =====
+
+  userState.set(userId, action);
+
+  const nextNode = resolveNode(action);
   if (!nextNode) {
     return ctx.editMessageText("❌ Сторінка недоступна");
   }
 
-  renderNode(ctx, nextNode);
+  return renderNode(ctx, nextNode);
 }
+
 
 export function resolveNode(nodeId: string): BotNode | null {
   //  динамічна сторінка вакансії
+
+  if (nodeId.startsWith("unit_vacancy_")) {
+    const id = nodeId.replace("unit_vacancy_", "");
+    const vacancy = unitVacancies.find((v) => v.id === id);
+
+    if (!vacancy) return null;
+
+    return {
+      id: nodeId,
+      text: `<b>${vacancy.title}</b>\nПідрозділ: уточнюється`,
+      buttons: [
+        { label: "📝 Подати заявку", goTo: "join" },
+        { label: "⬅️ Назад", goTo: "vacancies_units" },
+      ],
+    };
+  }
+
   if (nodeId.startsWith("vacancy_")) {
     const vacancyId = nodeId.replace("vacancy_", "");
     const vacancy = getVacancyById(vacancyId);
