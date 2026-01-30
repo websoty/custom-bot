@@ -1,18 +1,32 @@
 import type { BotNode } from "../types/bot.js";
 import { vacancies } from "../services/vacancies.js";
+import { unitVacancies } from "../services/unitVacancies.js";
 
 export const botTree: Record<string, BotNode> = {
 
-all_vacancies: {
-  id: "all_vacancies",
-  text: "Доступні вакансії:",
-  buttons: vacancies.map(v => ({
-    label: v.title,
-    goTo: `vacancy_${v.id}`
-  })).concat([{ label: "⬅️ Повернутись у головне меню", goTo: "start" }])
-},
+  all_vacancies: {
+    id: "all_vacancies",
+    text: "Доступні вакансії:",
+    buttons: vacancies
+      .map(v => ({
+        label: v.title,
+        goTo: `vacancy_${v.id}`,
+      }))
+      .concat([{ label: "⬅️ Повернутись у головне меню", goTo: "start" }]),
+  },
 
+  vacancies_units: {
+    id: "vacancies_units",
+    text: "Вакансії підрозділів:",
+    buttons: unitVacancies
+      .map(v => ({
+        label: v.title,
+        goTo: `unit_vacancy_${v.id}`,
+      }))
+      .concat([{ label: "⬅️ Назад", goTo: "civilian_vacancies" }]),
+  },
 
+    // start, main screen
   start: {
     id: "start",
     text: "Ви у головному меню, оберіть потрібний вам розділ ⬇️",
@@ -36,7 +50,9 @@ all_vacancies: {
 
   join: {
     id: "join",
-    text: "УВАГА - на жаль, ми не розглядаємо підрозділи ДПСУ, Національної гвардії, СБУ, МВС для подальшої співпраці, якщо Ви служите у вашому підрозділі менше ніж 8 місяців, ми також не зможемо розглянути Вашу анкету.",
+    text:
+      "УВАГА - на жаль, ми не розглядаємо підрозділи ДПСУ, Національної гвардії, СБУ, МВС для подальшої співпраці, " +
+      "якщо Ви служите у вашому підрозділі менше ніж 8 місяців, ми також не зможемо розглянути Вашу анкету.",
     buttons: [
       { label: "🪖 Військовий", goTo: "join_military" },
       { label: "👤 Цивільний", goTo: "civilian_education" },
@@ -44,7 +60,7 @@ all_vacancies: {
     ],
   },
 
-  //military
+  // military
   join_military: {
     id: "join_military",
     text: "Оберіть, з чим Вам потрібна допомога",
@@ -55,6 +71,7 @@ all_vacancies: {
     ],
   },
 
+  // awol - сзч
   awol: {
     id: "awol",
     text: "Вкажіть, чи є це першим випадком СЗЧ?",
@@ -87,33 +104,52 @@ all_vacancies: {
 
   act_awol: {
     id: "act_awol",
-    text: "процес",
-    buttons: [
-      { label: "aaaaa", goTo: "start" },
-      { label: "⬅️ Назад", goTo: "rank" },
-    ],
+    text:
+      "Дякуємо.\nВаш запит прийнято, з Вами звʼяжуться для подальших дій.",
+    buttons: [{ label: "⬅️ Повернутись у головне меню", goTo: "start" }],
   },
 
-  // transfer
+  // mil. transfer - перевод
   transfer: {
     id: "transfer",
     text: "Місце проходження служби",
     buttons: [
-      { label: "Служу в бойовій частині", goTo: "health" },
-      { label: "Служу в тиловій частині", goTo: "health" },
+      { label: "Служу в бойовій частині", goTo: "health_transfer" },
+      { label: "Служу в тиловій частині", goTo: "health_transfer" },
       { label: "⬅️ Назад", goTo: "join_military" },
     ],
   },
 
-  act_transfer: {
-    id: "act_transfer",
-    text: "процес",
+  health_transfer: {
+    id: "health_transfer",
+    text: "Яке рішення військово-лікарської комісії (ВЛК) Вам встановлено?",
     buttons: [
-      { label: "aaaaa", goTo: "start" },
-      { label: "⬅️ Назад", goTo: "rank" },
+      { label: "Придатний", goTo: "rank_transfer" },
+      { label: "Обмежено придатний", goTo: "rank_transfer" },
+      { label: "⬅️ Назад", goTo: "transfer" },
     ],
   },
 
+  rank_transfer: {
+    id: "rank_transfer",
+    text: "Ваше військове звання",
+    buttons: [
+      { label: "Солдат/Сержант", goTo: "transfer_vacancies" },
+      { label: "Офіцер", goTo: "transfer_vacancies" },
+      { label: "⬅️ Назад", goTo: "health_transfer" },
+    ],
+  },
+
+  transfer_vacancies: {
+    id: "transfer_vacancies",
+    buttons: [
+      { label: "Вакансії підрозділів", goTo: "vacancies_units" },
+      { label: "Усі вакансії", goTo: "all_vacancies" },
+      { label: "⬅️ Назад", goTo: "rank_transfer" },
+    ],
+  },
+
+  // civilian
   civilian_education: {
     id: "civilian_education",
     text: "Оберіть рівень військової підготовки",
@@ -126,7 +162,6 @@ all_vacancies: {
 
   civilian_vacancies: {
     id: "civilian_vacancies",
-    text: "1234567",
     buttons: [
       { label: "Вакансії підрозділів", goTo: "vacancies_units" },
       { label: "Усі вакансії", goTo: "all_vacancies" },

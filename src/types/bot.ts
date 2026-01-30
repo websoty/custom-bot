@@ -10,3 +10,9 @@ export type BotNode = {
   text?: string;
   buttons?: BotButton[];
 };
+
+
+export type VacancyLike = {
+  id: string;
+  title: string;
+}
