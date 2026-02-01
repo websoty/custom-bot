@@ -45,7 +45,8 @@ export function makeVacanciesKeyboard(
     return row;
   }).filter((row) => row.length > 0);
 
-  const totalPages = Math.ceil(vacancies.length / PAGE_SIZE);
+const totalPages = Math.ceil(items.length / PAGE_SIZE);
+
 
   rows.push([
     {
@@ -61,6 +62,8 @@ export function makeVacanciesKeyboard(
       callback_data: options?.nextCallback ?? "vacancies_next",
     },
   ]);
+
+  
 
   return rows;
 }
