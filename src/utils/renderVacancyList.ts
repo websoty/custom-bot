@@ -14,6 +14,7 @@ type RenderOptions = {
   itemPrefix?: string;
   prevCallback: string;
   nextCallback: string;
+  backCallback: string;
 };
 
 export function renderVacancyList(
@@ -28,6 +29,7 @@ export function renderVacancyList(
     itemPrefix = "vacancy_",
     prevCallback,
     nextCallback,
+    backCallback,
   } = options;
 
   if (mode === "init") {
@@ -42,15 +44,12 @@ export function renderVacancyList(
     pageState[pageKey]++;
   }
 
-  const keyboard = makeVacanciesKeyboard(
-    items,
-    pageState[pageKey],
-    {
-      itemPrefix,
-      prevCallback,
-      nextCallback,
-    }
-  );
+  const keyboard = makeVacanciesKeyboard(items, pageState[pageKey], {
+    itemPrefix,
+    prevCallback,
+    nextCallback,
+    backCallback,
+  });
 
   if (mode === "init") {
     return ctx.editMessageText(options.title, {
