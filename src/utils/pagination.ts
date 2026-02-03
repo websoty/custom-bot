@@ -1,6 +1,5 @@
 import { vacancies } from "../services/vacancies.js";
 import type { VacancyLike } from "../types/bot.js";
-
 const PAGE_SIZE = 10;
 
 /**
@@ -26,27 +25,36 @@ export function makeVacanciesKeyboard(
   const rightCol = pageVacancies.slice(5, 10);
 
   const rows = Array.from({ length: 5 }, (_, i) => {
-    const row: { text: string; callback_data: string }[] = [];
+    const row: { text: string; callback_data?: string; url?: string }[] = [];
     const left = leftCol[i];
     const right = rightCol[i];
 
-    if (left)
-      row.push({
-        text: left.title,
-        callback_data: `${options?.itemPrefix ?? "vacancy_"}${left.id}`,
-      });
+    if (left) {
+      row.push(
+        left.url
+          ? { text: left.title, url: left.url }
+          : {
+              text: left.title,
+              callback_data: `${options?.itemPrefix ?? "vacancy_"}${left.id}`,
+            },
+      );
+    }
 
-    if (right)
-      row.push({
-        text: right.title,
-        callback_data: `${options?.itemPrefix ?? "vacancy_"}${right.id}`,
-      });
+    if (right) {
+      row.push(
+        right.url
+          ? { text: right.title, url: right.url }
+          : {
+              text: right.title,
+              callback_data: `${options?.itemPrefix ?? "vacancy_"}${right.id}`,
+            },
+      );
+    }
 
     return row;
   }).filter((row) => row.length > 0);
 
-const totalPages = Math.ceil(items.length / PAGE_SIZE);
-
+  const totalPages = Math.ceil(items.length / PAGE_SIZE);
 
   rows.push([
     {
@@ -63,7 +71,13 @@ const totalPages = Math.ceil(items.length / PAGE_SIZE);
     },
   ]);
 
-  
+  rows.push([
+  {
+    text: "🏠 Повернутись у головне меню",
+    callback_data: "start",
+  },
+]);
+
 
   return rows;
 }
