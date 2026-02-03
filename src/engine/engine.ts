@@ -3,12 +3,12 @@ import { botTree } from "../tree/botTree.js";
 import { renderNode } from "./render.js";
 import { getVacancyById } from "../services/vacancies.js";
 import type { BotNode } from "../types/bot.js";
-import { makeVacanciesKeyboard } from "../utils/pagination.js";
 import { userPage } from "../store/userState.js";
 import { vacancies } from "../services/vacancies.js";
 import { unitVacancies } from "../services/unitVacancies.js";
 import { renderVacancyList } from "../utils/renderVacancyList.js";
 import { userRole } from "../store/userRole.js";
+import { units } from "../services/units.js";
 
 const userState = new Map<number, string>();
 
@@ -149,6 +149,78 @@ export async function handleAction(ctx: Context) {
       "next",
     );
   }
+
+  if (action === "units_list") {
+    return renderVacancyList(
+      ctx,
+      pageState,
+      {
+        title: "Підрозділи:",
+        items: units,
+        pageKey: "units",
+        itemPrefix: "unit_",
+        prevCallback: "units_prev",
+        nextCallback: "units_next",
+        backCallback: "start",
+        forceReply: true,
+      },
+      "init",
+    );
+  }
+
+  if (action === "units_prev") {
+    return renderVacancyList(
+      ctx,
+      pageState,
+      {
+        title: "Підрозділи:",
+        items: units,
+        pageKey: "units",
+        itemPrefix: "unit_",
+        prevCallback: "units_prev",
+        nextCallback: "units_next",
+        backCallback: "start",
+      },
+      "prev",
+    );
+  }
+
+  if (action === "units_next") {
+    return renderVacancyList(
+      ctx,
+      pageState,
+      {
+        title: "Підрозділи:",
+        items: units,
+        pageKey: "units",
+        itemPrefix: "unit_",
+        prevCallback: "units_prev",
+        nextCallback: "units_next",
+        backCallback: "start",
+      },
+      "next",
+    );
+  }
+  if (action.startsWith("unit_vacancies_")) {
+    const unitId = action.replace("unit_vacancies_", "");
+
+    const filtered = vacancies.filter((v) => v.unitId === unitId);
+
+    return renderVacancyList(
+      ctx,
+      pageState,
+      {
+        title: "Вакансії підрозділу:",
+        items: filtered,
+        pageKey: "all",
+        prevCallback: "vacancies_prev",
+        nextCallback: "vacancies_next",
+        backCallback: "units_list",
+      },
+      "init",
+    );
+  }
+
   // FALLBACK
 
   userState.set(userId, action);
@@ -217,6 +289,88 @@ ${vacancy.short}
       ],
     };
   }
+  if (nodeId.startsWith("unit_")) {
+    const id = nodeId.replace("unit_", "");
+    const unit = units.find((u) => u.id === id);
+
+    if (!unit) return null;
+
+    return {
+      id: nodeId,
+      text: `
+<b>${unit.title}</b>
+
+${unit.description}
+
+Оберіть дію:
+`,
+      buttons: [
+        {
+          label: "📋 Актуальні вакансії підрозділу",
+          goTo: `unit_vacancies_${unit.id}`,
+        },
+        {
+          label: "ℹ️ Детальніше",
+          goTo: `unit_details_${unit.id}`,
+        },
+        {
+          label: "⬅️ Назад",
+          goTo: "units_list",
+        },
+      ],
+    };
+  }
+
+  if (nodeId.startsWith("unit_details_")) {
+    const id = nodeId.replace("unit_details_", "");
+    const unit = units.find((u) => u.id === id);
+
+    if (!unit) return null;
+
+    return {
+      id: nodeId,
+      text: `
+<b>${unit.title}</b>
+
+Розширений опис підрозділу.
+Традиції, напрямок, особливості служби.
+`,
+      buttons: [{ label: "⬅️ Назад", goTo: `unit_${unit.id}` }],
+    };
+  }
+
+  if (nodeId.startsWith("unit_")) {
+    const id = nodeId.replace("unit_", "");
+    const unit = units.find((u) => u.id === id);
+
+    if (!unit) return null;
+
+    return {
+      id: nodeId,
+      text: `
+<b>${unit.title}</b>
+
+${unit.description}
+
+Оберіть дію:
+`,
+      buttons: [
+        {
+          label: "📋 Ці вакансії",
+          goTo: `unit_vacancies_${unit.id}`,
+        },
+        {
+          label: "ℹ️ Детальніше",
+          goTo: `unit_details_${unit.id}`,
+        },
+        {
+          label: "⬅️ Назад",
+          goTo: "units_list",
+        },
+      ],
+    };
+  }
+
   //  звичайні статичні ноди
   return botTree[nodeId] ?? null;
 }

@@ -1,6 +1,7 @@
 import { Context } from "telegraf";
 import { makeVacanciesKeyboard } from "../utils/pagination.js";
 import type { VacancyLike } from "../types/bot.js";
+import type { InlineKeyboardButton } from "telegraf/types";
 
 type PageState = {
   all: number;
@@ -15,6 +16,7 @@ type RenderOptions = {
   prevCallback: string;
   nextCallback: string;
   backCallback: string;
+  forceReply?: boolean;
 };
 
 export function renderVacancyList(
@@ -51,13 +53,20 @@ export function renderVacancyList(
     backCallback,
   });
 
-  if (mode === "init") {
-    return ctx.editMessageText(options.title, {
-      reply_markup: { inline_keyboard: keyboard },
+if (mode === "init") {
+  if (options.forceReply) {
+    return ctx.reply(options.title, {
+      reply_markup: { inline_keyboard: keyboard as InlineKeyboardButton[][],},
     });
   }
 
+  return ctx.editMessageText(options.title, {
+    reply_markup: { inline_keyboard: keyboard as InlineKeyboardButton[][],},
+  });
+}
+
+
   return ctx.editMessageReplyMarkup({
-    inline_keyboard: keyboard,
+    inline_keyboard: keyboard as InlineKeyboardButton[][],
   });
 }
