@@ -311,7 +311,7 @@ ${unit.description}
         },
         {
           label: "ℹ️ Детальніше",
-          goTo: `unit_details_${unit.id}`,
+          goTo: "contact_rc",
         },
         {
           label: "⬅️ Назад",
@@ -361,7 +361,7 @@ ${unit.description}
         },
         {
           label: "ℹ️ Детальніше",
-          goTo: `unit_details_${unit.id}`,
+          goTo: "contact_rc",
         },
         {
           label: "⬅️ Назад",

@@ -41,6 +41,19 @@ export function renderNode(ctx: Context, node: BotNode) {
     );
   }
 
+  const isCallbackFromMedia =
+  ctx.callbackQuery?.message &&
+  ("photo" in ctx.callbackQuery.message ||
+   "animation" in ctx.callbackQuery.message);
+
+if (isCallbackFromMedia) {
+  return ctx.reply(node.text ?? "", {
+    parse_mode: "HTML",
+    reply_markup: keyboard,
+  });
+}
+
+
   if (ctx.callbackQuery?.message) {   
      // є текст  міняємо текст + кнопки
     if (node.text) {

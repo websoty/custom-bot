@@ -192,7 +192,6 @@ export const botTree: Record<string, BotNode> = {
     buttons: [
       { label: "Вакансії підрозділів", goTo: "vacancies_units" },
       { label: "Усі вакансії", goTo: "all_vacancies" },
-      { label: "⬅️ Назад", goTo: "civilian_education" },
       { label: "🏠 Повернутись у головне меню", goTo: "start" },
     ],
   },
@@ -257,9 +256,9 @@ export const botTree: Record<string, BotNode> = {
     id: "about",
     text: "Про СБС",
     buttons: [
-      { label: "Підрозділи", goTo: "units" },
-      { label: "Умови служби", goTo: "service_conditions" },
-      { label: "Контракт 18-24", goTo: "contract" },
+      { label: "🪖 Підрозділи", goTo: "units" },
+      { label: "📋 Умови служби", goTo: "service_conditions" },
+      { label: "📰 Контракт 18-24", goTo: "contract" },
       { label: "Інші поширенні питання", goTo: "questions" },
       { label: "⬅️ Назад", goTo: "start" },
     ],
@@ -279,9 +278,9 @@ export const botTree: Record<string, BotNode> = {
     id: "contract",
     text: "Контракт 18-24",
     buttons: [
-      { label: "Посади", goTo: "all_vacancies" },
-      { label: "Підрозділи", goTo: "units" },
-      { label: "Умови контракту", goTo: "terms_contract" },
+      { label: "⚔️ Посади", goTo: "all_vacancies" },
+      { label: "🛡 Підрозділи", goTo: "units" },
+      { label: "📋 Умови контракту", goTo: "terms_contract" },
       { label: "⬅️ Назад", goTo: "about" },
     ],
   },
@@ -291,7 +290,7 @@ export const botTree: Record<string, BotNode> = {
     text: "Перейдіть будь-ласка за посиланням, для ознайомлення.",
     buttons: [
       {
-        label: "Умови контракту 18-24",
+        label: "📋 Умови контракту 18-24",
         url: "https://18-24.army.gov.ua/assets/%D0%9A%D0%BE%D0%BD%D1%82%D1%80%D0%B0%D0%BA%D1%82_18-24.pdf",
       },
       { label: "⬅️ Назад", goTo: "contract" },
@@ -326,6 +325,24 @@ export const botTree: Record<string, BotNode> = {
     buttons: [
       { label: "📋 Переглянути підрозділи", goTo: "units_list" },
       { label: "⬅️ Назад", goTo: "about" },
+    ],
+  },
+
+  units_details: {
+    id: "units_details",
+    text: `
+<b>Про підрозділи СБС</b>
+
+• напрямки
+• особливості служби
+• підготовку
+• традиції
+
+ℹ️ Деталі залежать від конкретного підрозділу
+`,
+    buttons: [
+      { label: "📑Залишити заявку для уточнення", goTo: "contact_rc" },
+      { label: "⬅️ Назад", goTo: "units" },
     ],
   },
 };

@@ -74,4 +74,29 @@ export const units = [
     title: "Рота забезпечення",
     description: "Логістика та постачання",
   },
+  {
+    id: "fpv_unit",
+    title: "Підрозділ FPV-дронів",
+    description: "Ураження цілей ударними FPV-дронами",
+  },
+  {
+    id: "training_unit",
+    title: "Навчальний центр",
+    description: "Підготовка та підвищення кваліфікації",
+  },
+  {
+    id: "hq_unit",
+    title: "Штаб підрозділу",
+    description: "Планування та управління операціями",
+  },
+  {
+    id: "support_platoon",
+    title: "Взвод вогневої підтримки",
+    description: "Міномети, кулемети, ПТРК",
+  },
+  {
+    id: "repair_unit",
+    title: "Ремонтний взвод",
+    description: "Ремонт та евакуація техніки",
+  },
 ];
