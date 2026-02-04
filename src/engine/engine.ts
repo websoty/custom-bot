@@ -9,16 +9,30 @@ import { unitVacancies } from "../services/unitVacancies.js";
 import { renderVacancyList } from "../utils/renderVacancyList.js";
 import { userRole } from "../store/userRole.js";
 import { units } from "../services/units.js";
+import { registerUserIfNotExists } from "../services/userService.js";
 
 const userState = new Map<number, string>();
 
 export function handleStart(ctx: Context) {
   const userId = ctx.from!.id;
+
+  let payload: string | undefined;
+
+  if (ctx.message && "text" in ctx.message) {
+    const text = ctx.message.text;
+    payload = text.startsWith("/start ")
+      ? text.replace("/start ", "")
+      : undefined;
+  }
+
+  registerUserIfNotExists(ctx.from, payload);
+
   userState.set(userId, "start");
 
   console.log("[START]", userId);
   renderNode(ctx, botTree["start"]!);
 }
+
 
 export async function handleAction(ctx: Context) {
   if (!ctx.callbackQuery || !("data" in ctx.callbackQuery)) return;
