@@ -26,7 +26,7 @@ export function registerUserIfNotExists(
   const utm = parseUtm(startPayload);
 
   const existingUser = getUserByTelegramId(from.id);
-  
+
   if (existingUser) {
     return existingUser;
   }
@@ -38,6 +38,7 @@ export function registerUserIfNotExists(
     lastName: from.last_name,
     utmSource: utm.utmSource,
     utmCampaign: utm.utmCampaign,
+    tags: new Set(["registered"]),
     createdAt: new Date(),
   };
 

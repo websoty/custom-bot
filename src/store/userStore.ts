@@ -5,6 +5,7 @@ export type User = {
   lastName: string | undefined;
   utmSource: string | undefined;
   utmCampaign: string | undefined;
+  tags: Set<string>;
   createdAt: Date;
 };
 

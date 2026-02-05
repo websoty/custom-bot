@@ -2,9 +2,16 @@ import { Context } from "telegraf";
 import type { BotNode } from "../types/bot.js";
 import type { InlineKeyboardButton } from "telegraf/types";
 import { resolveAssetPath } from "../utils/media.js";
+import { addAutoTags } from "../services/autoTags.js";
+import { trackNodeVisit } from "../store/visitStore.js";
 
 export function renderNode(ctx: Context, node: BotNode) {
   console.log("[RENDER]", node.id);
+  const userId = ctx.from?.id;
+  if (userId) {
+    addAutoTags(userId, node.id);
+    trackNodeVisit(userId, node.id);
+  }
 
   const keyboard = {
     inline_keyboard:
@@ -42,20 +49,19 @@ export function renderNode(ctx: Context, node: BotNode) {
   }
 
   const isCallbackFromMedia =
-  ctx.callbackQuery?.message &&
-  ("photo" in ctx.callbackQuery.message ||
-   "animation" in ctx.callbackQuery.message);
+    ctx.callbackQuery?.message &&
+    ("photo" in ctx.callbackQuery.message ||
+      "animation" in ctx.callbackQuery.message);
 
-if (isCallbackFromMedia) {
-  return ctx.reply(node.text ?? "", {
-    parse_mode: "HTML",
-    reply_markup: keyboard,
-  });
-}
+  if (isCallbackFromMedia) {
+    return ctx.reply(node.text ?? "", {
+      parse_mode: "HTML",
+      reply_markup: keyboard,
+    });
+  }
 
-
-  if (ctx.callbackQuery?.message) {   
-     // є текст  міняємо текст + кнопки
+  if (ctx.callbackQuery?.message) {
+    // є текст  міняємо текст + кнопки
     if (node.text) {
       return ctx.editMessageText(node.text, {
         parse_mode: "HTML",
